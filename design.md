@@ -3,6 +3,17 @@
 So these are some rough thoughts on the design of various features, as I go through this.
 
 
+## Bots
+
+These are the separate 'bots' we plan on having:
+
+* **NickServ**: Nickname and account management.
+* **ChanServ**: Channel management.
+* **IdServ**: Identity management.
+* **OperServ**: Services management.
+* **MemoServ**: Sending and storing memos between users.
+
+
 ## Identity management
 
 1. Users can easily create an account.
