@@ -1,3 +1,6 @@
+// written by London Trust Media
+// released under the MIT license
+
 /*
 Package s2s provides IRC Server-to-Server protocol modules.
 
