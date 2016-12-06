@@ -8,6 +8,7 @@ Veritas is designed for use with InspIRCd. However, attempts have been made to u
 ## (Planned) Features
 
 * Extensive identity management and verification.
+* Chanmode/extban to restrict talking to verified individuals (GPG/Bitcoin verification).
 * Account and channel registration.
 * SASL authentication.
 * Management of accounts and channels.
