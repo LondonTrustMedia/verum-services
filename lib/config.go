@@ -10,8 +10,11 @@ import (
 
 // Config holds the core Veritas configuration information.
 type Config struct {
-	Services struct {
-		Name string
+	Server struct {
+		Name        string
+		Description string
+		AdminEmail  string `yaml:"admin-email"`
+		BannedEmail string `yaml:"ban-email"`
 	}
 	Linking struct {
 		Module      string `yaml:"protocol-module"`

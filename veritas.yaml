@@ -1,9 +1,18 @@
 # veritas services config
 
-# our info
-services:
-    # the name we'll be using
+# server info
+server:
+    # server name
     name: services.verum.im
+
+    # server description
+    description: "Veritas IRC Services"
+
+    # admin email, used in various responses
+    admin-email: "services@verum.im"
+
+    # email for ban appeals / etc
+    banned-email: "bans@verum.im"
 
 # linking info
 linking:
