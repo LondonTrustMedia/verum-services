@@ -16,16 +16,23 @@ var (
 
 // Protocol is the core S2S protocol interface that is implemented by all S2S protos.
 type Protocol interface {
+	// info methods
+	GetProtocolName() string
+
+	// events
 	Run()
+
+	// protocol handling/management
+	CasemapString(source string) (string, error)
 	AddClient(nick, user, host, realname string) error
 }
 
-// MakeProto returns a protocol module given the config.
+// MakeProto returns a generic protocol module given the config.
 func MakeProto(config *lib.Config) (Protocol, error) {
 	protoName := strings.ToLower(config.IRCd.Module)
 
 	if protoName == "inspircd" {
-		inspProto, err := makeInsp(config)
+		inspProto, err := MakeInsp(config)
 		return &inspProto, err
 	}
 
