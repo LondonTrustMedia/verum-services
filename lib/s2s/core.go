@@ -10,23 +10,23 @@ import (
 )
 
 var (
+	// ErrorNoProtocol is what it says on the tin.
 	ErrorNoProtocol = errors.New("Protocol not found")
 )
 
 // Protocol is the core S2S protocol interface that is implemented by all S2S protos.
 type Protocol interface {
 	Run()
-	AddClient(nick, user, host, realname string)
+	AddClient(nick, user, host, realname string) error
 }
 
 // MakeProto returns a protocol module given the config.
-func MakeProto(config *lib.Config) (*Protocol, error) {
-	var p *Protocol
-
+func MakeProto(config *lib.Config) (Protocol, error) {
 	protoName := strings.ToLower(config.IRCd.Module)
+
 	if protoName == "inspircd" {
 		inspProto, err := makeInsp(config)
-		return inspProto.(*Protocol), err
+		return &inspProto, err
 	}
 
 	return nil, ErrorNoProtocol

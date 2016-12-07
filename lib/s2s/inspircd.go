@@ -7,11 +7,17 @@ import "github.com/Verum/veritas/lib"
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
+	Protocol    string
 	Casemapping ircmap.MappingType
 }
 
-func makeInsp(config *lib.Config) (*InspIRCd, error) {
+func makeInsp(config *lib.Config) (InspIRCd, error) {
+	var p InspIRCd
 
+	p.Protocol = "InspIRCd"
+	p.Casemapping = ircmap.RFC1459
+
+	return p, nil
 }
 
 func (p *InspIRCd) Run() {
