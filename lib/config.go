@@ -17,10 +17,12 @@ type Config struct {
 		BannedEmail string `yaml:"ban-email"`
 	}
 	Linking struct {
-		Module      string `yaml:"protocol-module"`
-		ServerID    string `yaml:"sid"`
-		SendPass    string `yaml:"send-password"`
-		ReceivePass string `yaml:"receive-password"`
+		Module        string `yaml:"protocol-module"`
+		RemoteAddress string `yaml:"remote-address"`
+		UseTLS        bool   `yaml:"use-tls"`
+		ServerID      string `yaml:"sid"`
+		SendPass      string `yaml:"send-password"`
+		ReceivePass   string `yaml:"receive-password"`
 	}
 }
 

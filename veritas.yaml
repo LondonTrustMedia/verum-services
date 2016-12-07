@@ -16,11 +16,14 @@ server:
 
 # linking info
 linking:
+    # protocol module to use
+    protocol-module: inspircd
+
     # remote host:port to connect to
     remote-address: "localhost:12345"
 
-    # protocol module to use
-    protocol-module: inspircd
+    # use tls when linking
+    use-tls: true
 
     # # server ID (SID) for those protocols that require it
     # server-id: 4AB
