@@ -20,7 +20,7 @@ type Protocol interface {
 	GetProtocolName() string
 
 	// events
-	Run()
+	Run(config *lib.Config) error
 
 	// protocol handling/management
 	CasemapString(source string) (string, error)

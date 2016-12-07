@@ -2,8 +2,14 @@
 // released under the MIT license
 package s2s
 
-import "github.com/DanielOaks/girc-go/ircmap"
-import "github.com/Verum/veritas/lib"
+import (
+	"crypto/tls"
+	"fmt"
+	"net"
+
+	"github.com/DanielOaks/girc-go/ircmap"
+	"github.com/Verum/veritas/lib"
+)
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
@@ -26,8 +32,25 @@ func (p *InspIRCd) GetProtocolName() string {
 	return p.protocol
 }
 
-func (p *InspIRCd) Run() {
-	//TODO(dan): run here
+// Run connects to the remote and starts running.
+func (p *InspIRCd) Run(config *lib.Config) error {
+	// connect
+	var conn net.Conn
+	var err error
+
+	if config.Linking.UseTLS {
+		conn, err = tls.Dial("tcp", config.Linking.RemoteAddress, nil)
+	} else {
+		conn, err = net.Dial("tcp", config.Linking.RemoteAddress)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Connection opened:", conn)
+
+	return nil
 }
 
 // CasemapString returns a casemapped version of the source string.
