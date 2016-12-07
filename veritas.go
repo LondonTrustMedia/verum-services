@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/Verum/veritas/lib"
+	"github.com/Verum/veritas/lib/s2s"
 	docopt "github.com/docopt/docopt-go"
 )
 
@@ -30,13 +31,21 @@ Options:
 
 	arguments, _ := docopt.Parse(usage, nil, true, version, false)
 
+	if arguments["--license"].(bool) {
+		fmt.Println(lib.Copyright)
+		return
+	}
+
 	configfile := arguments["--conf"].(string)
 	config, err := lib.LoadConfig(configfile)
 	if err != nil {
 		log.Fatal("Config file did not load successfully:", err.Error())
 	}
 
-	if arguments["--license"].(bool) {
-		fmt.Println(lib.Copyright)
+	if arguments["run"].(bool) {
+		p := s2s.MakeProto(config)
+		fmt.Println("Loaded proto:", p)
+	} else {
+		fmt.Println("Function not yet implemented")
 	}
 }

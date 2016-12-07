@@ -3,9 +3,14 @@
 package s2s
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/Verum/veritas/lib"
+)
+
+var (
+	ErrorNoProtocol = errors.New("Protocol not found")
 )
 
 // Protocol is the core S2S protocol interface that is implemented by all S2S protos.
@@ -14,15 +19,15 @@ type Protocol interface {
 	AddClient(nick, user, host, realname string)
 }
 
-// MakeProro returns a protocol module given the config.
-func MakeProro(config *lib.Config) (Protocol, error) {
+// MakeProto returns a protocol module given the config.
+func MakeProto(config *lib.Config) (*Protocol, error) {
 	var p *Protocol
 
 	protoName := strings.ToLower(config.IRCd.Module)
 	if protoName == "inspircd" {
 		inspProto, err := makeInsp(config)
-		return inspProto, err
+		return inspProto.(*Protocol), err
 	}
 
-	return p, nil
+	return nil, ErrorNoProtocol
 }
