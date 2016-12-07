@@ -1,8 +1,21 @@
 # veritas services config
 
+# our info
+services:
+    # the name we'll be using
+    name: services.verum.im
 
+# linking info
+linking:
+    # remote host:port to connect to
+    remote-address: "localhost:12345"
 
+    # protocol module to use
+    protocol-module: inspircd
 
+    # # server ID (SID) for those protocols that require it
+    # server-id: 4AB
 
-
-
+    # passwords to send to and receive from the remote
+    send-password: "abcd"
+    receive-password: "abcd"

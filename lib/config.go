@@ -10,10 +10,14 @@ import (
 
 // Config holds the core Veritas configuration information.
 type Config struct {
-	IRCd struct {
-		Name     string
-		Module   string `yaml:"protocol-module"`
-		ServerID string `yaml:"sid"`
+	Services struct {
+		Name string
+	}
+	Linking struct {
+		Module      string `yaml:"protocol-module"`
+		ServerID    string `yaml:"sid"`
+		SendPass    string `yaml:"send-password"`
+		ReceivePass string `yaml:"receive-password"`
 	}
 }
 

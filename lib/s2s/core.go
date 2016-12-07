@@ -29,7 +29,7 @@ type Protocol interface {
 
 // MakeProto returns a generic protocol module given the config.
 func MakeProto(config *lib.Config) (Protocol, error) {
-	protoName := strings.ToLower(config.IRCd.Module)
+	protoName := strings.ToLower(config.Linking.Module)
 
 	if protoName == "inspircd" {
 		inspProto, err := MakeInsp(config)
