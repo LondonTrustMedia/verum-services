@@ -43,8 +43,8 @@ Options:
 	}
 
 	if arguments["run"].(bool) {
-		p := s2s.MakeProto(config)
-		fmt.Println("Loaded proto:", p)
+		p, err := s2s.MakeProto(config)
+		fmt.Println("Loaded proto:", p, err)
 	} else {
 		fmt.Println("Function not yet implemented")
 	}
