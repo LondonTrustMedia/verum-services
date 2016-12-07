@@ -9,10 +9,10 @@ server:
     description: "Veritas IRC Services"
 
     # admin email, used in various responses
-    admin-email: "services@verum.im"
+    admin-email: "services@example.com"
 
     # email for ban appeals / etc
-    banned-email: "bans@verum.im"
+    banned-email: "bans@example.com"
 
 # linking info
 linking:
