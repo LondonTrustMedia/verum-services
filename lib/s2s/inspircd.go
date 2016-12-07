@@ -15,6 +15,7 @@ import (
 type InspIRCd struct {
 	protocol    string
 	casemapping ircmap.MappingType
+	s           RFC1459Socket
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
@@ -48,7 +49,13 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 		return err
 	}
 
-	fmt.Println("Connection opened:", conn)
+	// open socket properly
+	p.s = NewRFC1459Socket(conn)
+	p.s.Start()
+
+	for {
+		fmt.Println("LINE:", <-p.s.ReceiveLines)
+	}
 
 	return nil
 }
