@@ -90,4 +90,11 @@ var (
 		Name: "tls-only",
 		Type: TypeD,
 	}
+
+	// others that are especially useful to keep synced between IRCds
+
+	ChanBlockColor = ChannelMode{
+		Name: "block-color",
+		Type: TypeC,
+	}
 )

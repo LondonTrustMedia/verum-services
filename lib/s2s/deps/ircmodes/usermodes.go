@@ -20,4 +20,15 @@ var (
 		Name: "registered",
 		Type: TypeD,
 	}
+	UserWallops = UserMode{
+		Name: "wallops",
+		Type: TypeD,
+	}
+
+	// widespread
+
+	UserBot = UserMode{
+		Name: "bot",
+		Type: TypeD,
+	}
 )
