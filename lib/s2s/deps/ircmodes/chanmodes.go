@@ -2,98 +2,99 @@
 // released under the MIT license
 package ircmodes
 
-// ChannelMode is a mode that can be set on a channel.
-type ChannelMode Mode
-
 var (
 	// prefix modes
 
-	ChanFounder = ChannelMode{
+	ChanFounder = Mode{
 		Name: "founder",
 		Type: ChanPrefix,
 	}
-	ChanAdmin = ChannelMode{
+	ChanAdmin = Mode{
 		Name: "admin",
 		Type: ChanPrefix,
 	}
-	ChanOp = ChannelMode{
+	ChanOp = Mode{
 		Name: "op",
 		Type: ChanPrefix,
 	}
-	ChanHalfop = ChannelMode{
+	ChanHalfop = Mode{
 		Name: "halfop",
 		Type: ChanPrefix,
 	}
-	ChanVoice = ChannelMode{
+	ChanVoice = Mode{
 		Name: "voice",
 		Type: ChanPrefix,
 	}
 
 	// standard
 
-	ChanBanException = ChannelMode{
+	ChanBanException = Mode{
 		Name: "ban-exception",
 		Type: TypeA,
 	}
-	ChanBan = ChannelMode{
+	ChanBan = Mode{
 		Name: "ban",
 		Type: TypeA,
 	}
-	ChanInviteException = ChannelMode{
+	ChanInviteException = Mode{
 		Name: "invite-exception",
 		Type: TypeA,
 	}
-	ChanInviteOnly = ChannelMode{
+	ChanInviteOnly = Mode{
 		Name: "invite-only",
 		Type: TypeD,
 	}
-	ChanKey = ChannelMode{
+	ChanKey = Mode{
 		Name: "key",
 		Type: TypeB,
 	}
-	ChanLimit = ChannelMode{
+	ChanLimit = Mode{
 		Name: "limit",
 		Type: TypeC,
 	}
-	ChanModerated = ChannelMode{
+	ChanModerated = Mode{
 		Name: "moderated",
 		Type: TypeD,
 	}
-	ChanNoExternal = ChannelMode{
+	ChanNoExternal = Mode{
 		Name: "noextmsg",
 		Type: TypeD,
 	}
-	ChanProtectedTopic = ChannelMode{
+	ChanProtectedTopic = Mode{
 		Name: "protected-topic",
 		Type: TypeD,
 	}
-	ChanSecret = ChannelMode{
+	ChanSecret = Mode{
 		Name: "secret",
 		Type: TypeD,
 	}
 
 	// widespread
 
-	ChanJoinThrottle = ChannelMode{
+	ChanJoinThrottle = Mode{
 		Name: "join-throttle",
 		Type: TypeC,
 	}
-	ChanRegistered = ChannelMode{
+	ChanPrivate = Mode{
+		Name: "private",
+		Type: TypeD,
+	}
+	ChanRegistered = Mode{
 		Name: "registered",
 		Type: TypeD,
 	}
-	ChanRegOnly = ChannelMode{
+	ChanRegOnly = Mode{
 		Name: "registered-only",
 		Type: TypeD,
 	}
-	ChanTLSOnly = ChannelMode{
+	ChanTLSOnly = Mode{
 		Name: "tls-only",
 		Type: TypeD,
 	}
 
 	// others that are especially useful to keep synced between IRCds
 
-	ChanBlockColor = ChannelMode{
+	ChanBlockColor = Mode{
 		Name: "block-color",
 		Type: TypeC,
 	}

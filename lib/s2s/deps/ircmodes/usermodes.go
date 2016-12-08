@@ -2,32 +2,29 @@
 // released under the MIT license
 package ircmodes
 
-// UserMode is a mode that can be set on a user.
-type UserMode Mode
-
 var (
 	// standard
 
-	UserInvisible = UserMode{
+	UserInvisible = Mode{
 		Name: "invisible",
 		Type: TypeD,
 	}
-	UserOper = UserMode{
+	UserOper = Mode{
 		Name: "oper",
 		Type: TypeD,
 	}
-	UserRegistered = UserMode{
+	UserRegistered = Mode{
 		Name: "registered",
 		Type: TypeD,
 	}
-	UserWallops = UserMode{
+	UserWallops = Mode{
 		Name: "wallops",
 		Type: TypeD,
 	}
 
 	// widespread
 
-	UserBot = UserMode{
+	UserBot = Mode{
 		Name: "bot",
 		Type: TypeD,
 	}

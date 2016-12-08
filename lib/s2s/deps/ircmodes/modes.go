@@ -27,25 +27,25 @@ type Mode struct {
 // ModeManager stores which letters represent which modes, and which mode letters are used for them.
 // It's used when parsing incoming modestrings and such.
 type ModeManager struct {
-	Modes      map[rune]*Mode
+	Modes      map[byte]*Mode
 	NameToMode map[string]*Mode
-	NameToRune map[string]rune
+	NameTobyte map[string]byte
 }
 
 // NewModeManager returns a fresh ModeManager.
 func NewModeManager() ModeManager {
 	var mm ModeManager
-	mm.Modes = make(map[rune]*Mode)
+	mm.Modes = make(map[byte]*Mode)
 	mm.NameToMode = make(map[string]*Mode)
-	mm.NameToRune = make(map[string]rune)
+	mm.NameTobyte = make(map[string]byte)
 	return mm
 }
 
 // AddMode adds a mode to our internal list.
-func (mm *ModeManager) AddMode(char rune, mode *Mode) {
+func (mm *ModeManager) AddMode(char byte, mode *Mode) {
 	mm.Modes[char] = mode
 	mm.NameToMode[mode.Name] = mode
-	mm.NameToRune[mode.Name] = char
+	mm.NameTobyte[mode.Name] = char
 }
 
 // ParseModestring parses an incoming modestring and returns a ModeList based on the mode types we have.
@@ -65,12 +65,12 @@ type ModeVal struct {
 
 // ModeList stores a list of modes and their values, i.e. on a client or a channel.
 type ModeList struct {
-	Modes map[rune]*ModeVal
+	Modes map[byte]*ModeVal
 }
 
 // NewModeList returns a fresh ModeList.
 func NewModeList() ModeList {
 	var ml ModeList
-	ml.Modes = make(map[rune]*ModeVal)
+	ml.Modes = make(map[byte]*ModeVal)
 	return ml
 }
