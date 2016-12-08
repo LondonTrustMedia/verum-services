@@ -48,11 +48,11 @@ Options:
 			fmt.Println("Error loading proto:", err)
 			return
 		}
-		fmt.Println("Loaded proto:", p, err)
+		fmt.Println("Loaded protocol module", p.GetProtocolName())
 
 		err = p.Run(config)
 		if err != nil {
-			fmt.Println("Error running proto:", err)
+			fmt.Println("Error running protocol module:", err)
 		}
 	} else {
 		fmt.Println("Function not yet implemented")
