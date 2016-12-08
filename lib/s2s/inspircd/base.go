@@ -22,8 +22,11 @@ type InspIRCd struct {
 	s           deps.RFC1459Socket
 	sid         string // server id
 
-	modsupport         map[string]bool // modules loaded on remote
 	receivedFirstBurst bool            // whether we've received first burst from remote
+	modsupport         map[string]bool // modules loaded on remote
+	chanmodes          map[string]string
+	usermodes          map[string]string
+	capabilities       map[string]string
 
 	clients   map[string]*Client
 	myClients map[string]*Client
@@ -31,15 +34,20 @@ type InspIRCd struct {
 
 // MakeInsp returns an InspIRCd S2S protocol module.
 func MakeInsp(config *lib.Config) (*InspIRCd, error) {
+	// we don't support generating SID. when we do, see how Insp does it.
+	if len(config.Linking.ServerID) != 3 {
+		return nil, deps.ErrorSIDIncorrect
+	}
+
+	// create protocol module
 	var p InspIRCd
 
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
 	p.modsupport = make(map[string]bool)
-
-	if len(config.Linking.ServerID) != 3 {
-		return nil, deps.ErrorSIDIncorrect
-	}
+	p.chanmodes = make(map[string]string)
+	p.usermodes = make(map[string]string)
+	p.capabilities = make(map[string]string)
 
 	return &p, nil
 }
@@ -104,7 +112,6 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 			continue
 		}
 		if err == nil {
-			fmt.Println("GOT LINE:", line)
 			if m.Command == "ERROR" {
 				fmt.Println("Received an ERROR, disconnecting:", line)
 				return fmt.Errorf("Received an ERROR from remote: %s", line)

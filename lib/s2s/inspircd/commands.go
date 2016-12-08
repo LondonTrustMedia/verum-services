@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// ErrorNotEnoughParams is returned when there aren't enough params in the message.
 	ErrorNotEnoughParams = errors.New("Not enough params")
 )
 
@@ -40,7 +41,7 @@ var (
 func HandleCommand(p *InspIRCd, m *ircmsg.IrcMessage, line string) error {
 	cmd, exists := Commands[m.Command]
 	if !exists || cmd == nil {
-		return fmt.Errorf("Command [%s] not implemented", m.Command)
+		return fmt.Errorf("Command %s not implemented", m.Command)
 	}
 
 	// check param length, etc
@@ -70,6 +71,48 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 		for _, name := range names {
 			if len(name) > 1 {
 				p.modsupport[name] = true
+			}
+		}
+	} else if subcmd == "CHANMODES" {
+		vars := strings.Split(m.Params[1], " ")
+		for _, val := range vars {
+			if len(val) > 1 {
+				keyval := strings.SplitN(val, "=", 2)
+				key := keyval[0]
+				var value string
+				if len(keyval) < 2 {
+					value = keyval[1]
+				}
+
+				p.chanmodes[key] = value
+			}
+		}
+	} else if subcmd == "USERMODES" {
+		vars := strings.Split(m.Params[1], " ")
+		for _, val := range vars {
+			if len(val) > 1 {
+				keyval := strings.SplitN(val, "=", 2)
+				key := keyval[0]
+				var value string
+				if len(keyval) < 2 {
+					value = keyval[1]
+				}
+
+				p.usermodes[key] = value
+			}
+		}
+	} else if subcmd == "CAPABILITIES" {
+		vars := strings.Split(m.Params[1], " ")
+		for _, val := range vars {
+			if len(val) > 1 {
+				keyval := strings.SplitN(val, "=", 2)
+				key := keyval[0]
+				var value string
+				if len(keyval) < 2 {
+					value = keyval[1]
+				}
+
+				p.capabilities[key] = value
 			}
 		}
 	} else {
