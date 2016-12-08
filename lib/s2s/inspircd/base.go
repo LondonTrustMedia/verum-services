@@ -17,17 +17,22 @@ import (
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
+	config *lib.Config
+
 	protocol    string
 	casemapping ircmap.MappingType
 	s           deps.RFC1459Socket
 	sid         string // server id
 
-	receivedFirstBurst bool            // whether we've received first burst from remote
-	modsupport         map[string]bool // modules loaded on remote
-	chanmodes          map[string]string
-	usermodes          map[string]string
-	capabilities       map[string]string
+	modsupport   map[string]bool // modules loaded on remote
+	chanmodes    map[string]string
+	usermodes    map[string]string
+	capabilities map[string]string
 
+	receivedFirstBurst bool // whether we've received first burst from remote
+
+	uplink    *Server
+	servers   map[string]*Server
 	clients   map[string]*Client
 	myClients map[string]*Client
 }
@@ -42,12 +47,18 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	// create protocol module
 	var p InspIRCd
 
+	p.config = config
+
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
 	p.modsupport = make(map[string]bool)
 	p.chanmodes = make(map[string]string)
 	p.usermodes = make(map[string]string)
 	p.capabilities = make(map[string]string)
+
+	p.servers = make(map[string]*Server)
+	p.clients = make(map[string]*Client)
+	p.myClients = make(map[string]*Client)
 
 	return &p, nil
 }
