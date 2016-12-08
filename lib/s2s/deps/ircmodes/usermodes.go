@@ -5,10 +5,11 @@ package ircmodes
 // UserMode is a mode that can be set on a user.
 type UserMode Mode
 
-// UserModes
 var (
-	UserInvible = UserMode{
-		Name: "invible",
+	// standard
+
+	UserInvisible = UserMode{
+		Name: "invisible",
 		Type: TypeD,
 	}
 	UserOper = UserMode{

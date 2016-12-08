@@ -14,6 +14,8 @@ const (
 	TypeC
 	// TypeD means modes that act as a flag, without any parameter.
 	TypeD
+	// ChanPrefix is for a channel prefix (voice, chanop, etc).
+	ChanPrefix
 )
 
 // Mode represents an IRC mode.

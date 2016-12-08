@@ -5,20 +5,42 @@ package ircmodes
 // ChannelMode is a mode that can be set on a channel.
 type ChannelMode Mode
 
-// ChanModes
 var (
+	// prefix modes
+
+	ChanFounder = ChannelMode{
+		Name: "founder",
+		Type: ChanPrefix,
+	}
+	ChanAdmin = ChannelMode{
+		Name: "admin",
+		Type: ChanPrefix,
+	}
+	ChanOp = ChannelMode{
+		Name: "op",
+		Type: ChanPrefix,
+	}
+	ChanHalfop = ChannelMode{
+		Name: "halfop",
+		Type: ChanPrefix,
+	}
+	ChanVoice = ChannelMode{
+		Name: "voice",
+		Type: ChanPrefix,
+	}
+
 	// standard
 
-	ChanBanExempt = ChannelMode{
-		Name: "ban-exempt",
+	ChanBanException = ChannelMode{
+		Name: "ban-exception",
 		Type: TypeA,
 	}
-	ChanBans = ChannelMode{
+	ChanBan = ChannelMode{
 		Name: "ban",
 		Type: TypeA,
 	}
-	ChanInviteExempt = ChannelMode{
-		Name: "invite-exempt",
+	ChanInviteException = ChannelMode{
+		Name: "invite-exception",
 		Type: TypeA,
 	}
 	ChanInviteOnly = ChannelMode{
@@ -38,7 +60,7 @@ var (
 		Type: TypeD,
 	}
 	ChanNoExternal = ChannelMode{
-		Name: "no-external",
+		Name: "noextmsg",
 		Type: TypeD,
 	}
 	ChanProtectedTopic = ChannelMode{
@@ -52,6 +74,18 @@ var (
 
 	// widespread
 
+	ChanJoinThrottle = ChannelMode{
+		Name: "join-throttle",
+		Type: TypeC,
+	}
+	ChanRegistered = ChannelMode{
+		Name: "registered",
+		Type: TypeD,
+	}
+	ChanRegOnly = ChannelMode{
+		Name: "registered-only",
+		Type: TypeD,
+	}
 	ChanTLSOnly = ChannelMode{
 		Name: "tls-only",
 		Type: TypeD,
