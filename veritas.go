@@ -44,6 +44,10 @@ Options:
 
 	if arguments["run"].(bool) {
 		p, err := s2s.MakeProto(config)
+		if err != nil {
+			fmt.Println("Error loading proto:", err)
+			return
+		}
 		fmt.Println("Loaded proto:", p, err)
 
 		err = p.Run(config)
