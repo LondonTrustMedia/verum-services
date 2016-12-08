@@ -17,6 +17,8 @@ import (
 var (
 	// ErrorNoProtocol is what it says on the tin.
 	ErrorNoProtocol = errors.New("Protocol not found")
+	// ErrorSIDIncorrect means that the SID wasn't defined or was incorrect.
+	ErrorSIDIncorrect = errors.New("ServerID is either incorrect or not defined")
 )
 
 // Protocol is the core S2S protocol interface that is implemented by all S2S protos.
@@ -38,7 +40,7 @@ func MakeProto(config *lib.Config) (Protocol, error) {
 
 	if protoName == "inspircd" {
 		inspProto, err := MakeInsp(config)
-		return &inspProto, err
+		return inspProto, err
 	}
 
 	return nil, ErrorNoProtocol
@@ -165,6 +167,17 @@ func (rs *RFC1459Socket) RunSocketListener() {
 	if !rs.socket.Closed {
 		rs.socket.Close()
 	}
+}
+
+// ReceiveMessage receives an IRC line from remote, decodes it as an IRC message, and returns the message, the raw line, and any possible errors.
+func (rs *RFC1459Socket) ReceiveMessage() (*ircmsg.IrcMessage, string, error) {
+	line := <-rs.ReceiveLines
+	m, err := ircmsg.ParseLine(line)
+	if err != nil {
+		return nil, line, err
+	}
+
+	return &m, line, nil
 }
 
 // Send sends an IRC line to the listener.

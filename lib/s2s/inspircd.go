@@ -19,13 +19,17 @@ type InspIRCd struct {
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
-func MakeInsp(config *lib.Config) (InspIRCd, error) {
+func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	var p InspIRCd
 
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
 
-	return p, nil
+	if len(config.Linking.ServerID) != 3 {
+		return nil, ErrorSIDIncorrect
+	}
+
+	return &p, nil
 }
 
 // GetProtocolName returns the name of this protocol module.
@@ -53,8 +57,29 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 	p.s = NewRFC1459Socket(conn)
 	p.s.Start()
 
+	// insp handshake
+	m, line, err := p.s.ReceiveMessage()
+
+	if err != nil {
+		return fmt.Errorf("Could not parse line [%s]: %s", line, err.Error())
+	}
+
+	if m.Command == "CAPAB" && len(m.Params) == 2 && m.Params[0] == "START" && m.Params[1] == "1202" {
+		// fall-through
+	} else {
+		return fmt.Errorf("CAPAB START line was not correct, got [%s]", line)
+	}
+
+	// send our CAPAB burst, incoming is handled by regular command handlers
+	p.s.Send(nil, "", "CAPAB", "START", "1202")
+	p.s.Send(nil, "", "CAPAB", "CAPABILITIES", "PROTOCOL=1202")
+	p.s.Send(nil, "", "CAPAB", "END")
+
+	// send our SERVER line
+	p.s.Send(nil, "", "SERVER", config.Server.Name, config.Linking.SendPass, "0", config.Linking.ServerID, config.Server.Description)
+
 	for {
-		fmt.Println("LINE:", <-p.s.ReceiveLines)
+		fmt.Println("GOT LINE:", <-p.s.ReceiveLines)
 	}
 
 	return nil
