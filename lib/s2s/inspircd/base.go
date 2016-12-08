@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DanielOaks/girc-go/ircmap"
+	"github.com/DanielOaks/girc-go/ircmsg"
 	"github.com/Verum/veritas/lib"
 	"github.com/Verum/veritas/lib/s2s/deps"
 )
@@ -89,7 +90,21 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 	p.s.Send(nil, sid, "ENDBURST")
 
 	for {
-		fmt.Println("GOT LINE:", <-p.s.ReceiveLines)
+		//TODO(dan): receive message or signal, select{} etc
+		m, line, err := p.s.ReceiveMessage()
+		if err == ircmsg.ErrorLineIsEmpty {
+			// skip empty lines
+			continue
+		}
+		if err == nil {
+			fmt.Println("GOT LINE:", line)
+			if m.Command == "ERROR" {
+				fmt.Println("Received an ERROR, disconnecting:", line)
+				return fmt.Errorf("Received an ERROR from remote: %s", line)
+			}
+		} else {
+			fmt.Println(fmt.Sprintf("Could not decode line [%s]: %s", line, err.Error()))
+		}
 	}
 
 	return nil
