@@ -1,6 +1,6 @@
 // written by London Trust Media
 // released under the MIT license
-package s2s
+package inspircd
 
 import (
 	"crypto/tls"
@@ -11,13 +11,14 @@ import (
 
 	"github.com/DanielOaks/girc-go/ircmap"
 	"github.com/Verum/veritas/lib"
+	"github.com/Verum/veritas/lib/s2s/deps"
 )
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
 	protocol           string
 	casemapping        ircmap.MappingType
-	s                  RFC1459Socket
+	s                  deps.RFC1459Socket
 	receivedFirstBurst bool // whether we've received first burst from remote
 }
 
@@ -29,7 +30,7 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	p.casemapping = ircmap.RFC1459
 
 	if len(config.Linking.ServerID) != 3 {
-		return nil, ErrorSIDIncorrect
+		return nil, deps.ErrorSIDIncorrect
 	}
 
 	return &p, nil
@@ -57,7 +58,7 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 	}
 
 	// open socket properly
-	p.s = NewRFC1459Socket(conn)
+	p.s = deps.NewRFC1459Socket(conn)
 	p.s.Start()
 
 	// insp handshake
