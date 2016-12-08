@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/DanielOaks/girc-go/ircmsg"
+	"github.com/Verum/veritas/lib/s2s/deps/ircmodes"
 )
 
 var (
@@ -112,7 +113,8 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 					if exists {
 						p.chanmodes.AddMode(value[0], mode)
 					} else {
-						fmt.Println("I don't know mode", val)
+						fmt.Println("I don't know mode", val, "autogenerating")
+						p.unknownCmodes[value[0]] = key
 					}
 				}
 
@@ -120,7 +122,6 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 			}
 		}
 	} else if subcmd == "USERMODES" {
-		fmt.Println("USERMODES:", m.Params[1])
 		vars := strings.Split(m.Params[1], " ")
 		for _, val := range vars {
 			if len(val) > 1 {
@@ -137,7 +138,8 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 					if exists {
 						p.usermodes.AddMode(value[0], mode)
 					} else {
-						fmt.Println("I don't know mode", val)
+						fmt.Println("I don't know mode", val, "autogenerating")
+						p.unknownUmodes[value[0]] = key
 					}
 				}
 
@@ -145,6 +147,7 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 			}
 		}
 	} else if subcmd == "CAPABILITIES" {
+		fmt.Println("CAPABILITIES:", m.Params[1])
 		vars := strings.Split(m.Params[1], " ")
 		for _, val := range vars {
 			if len(val) > 1 {
@@ -153,6 +156,68 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 				var value string
 				if len(keyval) > 1 {
 					value = keyval[1]
+				}
+
+				// autogenerate unknown channel modes
+				if key == "CHANMODES" {
+					splits := strings.Split(value, ",")
+
+					var modeType ircmodes.ModeType
+					for i, chars := range splits {
+						if i == 0 {
+							modeType = ircmodes.TypeA
+						} else if i == 1 {
+							modeType = ircmodes.TypeB
+						} else if i == 2 {
+							modeType = ircmodes.TypeC
+						} else if i == 3 {
+							modeType = ircmodes.TypeD
+						} else {
+							break
+						}
+
+						for _, char := range chars {
+							name, exists := p.unknownCmodes[byte(char)]
+							if exists {
+								newMode := ircmodes.Mode{
+									Name: fmt.Sprintf("insp-%s", name),
+									Type: modeType,
+								}
+								p.chanmodes.AddMode(byte(char), &newMode)
+							}
+						}
+					}
+				}
+
+				// autogenerate unknown user modes
+				if key == "USERMODES" {
+					splits := strings.Split(value, ",")
+
+					var modeType ircmodes.ModeType
+					for i, chars := range splits {
+						if i == 0 {
+							modeType = ircmodes.TypeA
+						} else if i == 1 {
+							modeType = ircmodes.TypeB
+						} else if i == 2 {
+							modeType = ircmodes.TypeC
+						} else if i == 3 {
+							modeType = ircmodes.TypeD
+						} else {
+							break
+						}
+
+						for _, char := range chars {
+							name, exists := p.unknownUmodes[byte(char)]
+							if exists {
+								newMode := ircmodes.Mode{
+									Name: fmt.Sprintf("insp-%s", name),
+									Type: modeType,
+								}
+								p.usermodes.AddMode(byte(char), &newMode)
+							}
+						}
+					}
 				}
 
 				p.capabilities[key] = value

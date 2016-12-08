@@ -25,10 +25,12 @@ type InspIRCd struct {
 	s           deps.RFC1459Socket
 	sid         string // server id
 
-	modsupport   map[string]bool // modules loaded on remote
-	chanmodesraw map[string]string
-	usermodesraw map[string]string
-	capabilities map[string]string
+	modsupport    map[string]bool // modules loaded on remote
+	unknownCmodes map[byte]string
+	unknownUmodes map[byte]string
+	chanmodesraw  map[string]string
+	usermodesraw  map[string]string
+	capabilities  map[string]string
 
 	chanmodes ircmodes.ModeManager
 	usermodes ircmodes.ModeManager
@@ -56,6 +58,8 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
 	p.modsupport = make(map[string]bool)
+	p.unknownCmodes = make(map[byte]string)
+	p.unknownUmodes = make(map[byte]string)
 	p.chanmodesraw = make(map[string]string)
 	p.usermodesraw = make(map[string]string)
 	p.capabilities = make(map[string]string)
