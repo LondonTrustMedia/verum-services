@@ -22,3 +22,10 @@ These are the separate 'bots' we plan on having:
 4. Show verified details in /WHOIS, and note that users should be /WHOISing other users often.
 
 We could also tie the WHOIS display into the various Bitcoin/GPG trust indexes/sites. So for instance, show their *coin/GPG identity as well as how trusted that identity is. Essentially, to stop people from just verifying to get 'the tick' next to their name and then impersonating people.
+
+
+## Events
+
+Veritas is intentionally single-threaded, at least with relation to accepting incoming lines, running the command-handlers of those, and dispatching events from those handlers.
+
+We do this to ensure that we don't need to deal with complex locking/etc requirements which could prove irritating and fragile down the road.
