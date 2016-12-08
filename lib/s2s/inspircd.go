@@ -6,6 +6,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
+	"strconv"
+	"time"
 
 	"github.com/DanielOaks/girc-go/ircmap"
 	"github.com/Verum/veritas/lib"
@@ -13,9 +15,10 @@ import (
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
-	protocol    string
-	casemapping ircmap.MappingType
-	s           RFC1459Socket
+	protocol           string
+	casemapping        ircmap.MappingType
+	s                  RFC1459Socket
+	receivedFirstBurst bool // whether we've received first burst from remote
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
@@ -76,7 +79,13 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 	p.s.Send(nil, "", "CAPAB", "END")
 
 	// send our SERVER line
-	p.s.Send(nil, "", "SERVER", config.Server.Name, config.Linking.SendPass, "0", config.Linking.ServerID, config.Server.Description)
+	sid := config.Linking.ServerID
+	p.s.Send(nil, "", "SERVER", config.Server.Name, config.Linking.SendPass, "0", sid, config.Server.Description)
+
+	// send burst as well
+	p.s.Send(nil, sid, "BURST", strconv.FormatInt(time.Now().Unix(), 10))
+	p.s.Send(nil, sid, "VERSION", fmt.Sprintf("Veritas-%s using %s", lib.SemVer, p.protocol))
+	p.s.Send(nil, sid, "ENDBURST")
 
 	for {
 		fmt.Println("GOT LINE:", <-p.s.ReceiveLines)
