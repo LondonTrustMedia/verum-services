@@ -20,7 +20,7 @@ type Config struct {
 		Module        string `yaml:"protocol-module"`
 		RemoteAddress string `yaml:"remote-address"`
 		UseTLS        bool   `yaml:"use-tls"`
-		ServerID      string `yaml:"sid"`
+		ServerID      string `yaml:"server-id"`
 		SendPass      string `yaml:"send-password"`
 		ReceivePass   string `yaml:"receive-password"`
 	}
