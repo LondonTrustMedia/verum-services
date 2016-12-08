@@ -1,5 +1,5 @@
 // written by London Trust Media
-// uses code from Jeremy Latt
+// this file includes code from Jeremy Latt
 // released under the MIT license
 package deps
 

@@ -17,10 +17,16 @@ import (
 
 // InspIRCd is the S2S protocol module for Insp.
 type InspIRCd struct {
-	protocol           string
-	casemapping        ircmap.MappingType
-	s                  deps.RFC1459Socket
-	receivedFirstBurst bool // whether we've received first burst from remote
+	protocol    string
+	casemapping ircmap.MappingType
+	s           deps.RFC1459Socket
+	sid         string // server id
+
+	modsupport         map[string]bool // modules loaded on remote
+	receivedFirstBurst bool            // whether we've received first burst from remote
+
+	clients   map[string]*Client
+	myClients map[string]*Client
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
@@ -29,6 +35,7 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
+	p.modsupport = make(map[string]bool)
 
 	if len(config.Linking.ServerID) != 3 {
 		return nil, deps.ErrorSIDIncorrect
@@ -81,13 +88,13 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 	p.s.Send(nil, "", "CAPAB", "END")
 
 	// send our SERVER line
-	sid := config.Linking.ServerID
-	p.s.Send(nil, "", "SERVER", config.Server.Name, config.Linking.SendPass, "0", sid, config.Server.Description)
+	p.sid = config.Linking.ServerID
+	p.s.Send(nil, "", "SERVER", config.Server.Name, config.Linking.SendPass, "0", p.sid, config.Server.Description)
 
 	// send burst as well
-	p.s.Send(nil, sid, "BURST", strconv.FormatInt(time.Now().Unix(), 10))
-	p.s.Send(nil, sid, "VERSION", fmt.Sprintf("Veritas-%s using %s", lib.SemVer, p.protocol))
-	p.s.Send(nil, sid, "ENDBURST")
+	p.s.Send(nil, p.sid, "BURST", strconv.FormatInt(time.Now().Unix(), 10))
+	p.s.Send(nil, p.sid, "VERSION", fmt.Sprintf("Veritas-%s using %s", lib.SemVer, p.protocol))
+	p.s.Send(nil, p.sid, "ENDBURST")
 
 	for {
 		//TODO(dan): receive message or signal, select{} etc
@@ -101,6 +108,11 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 			if m.Command == "ERROR" {
 				fmt.Println("Received an ERROR, disconnecting:", line)
 				return fmt.Errorf("Received an ERROR from remote: %s", line)
+			}
+
+			err = HandleCommand(p, m, line)
+			if err != nil {
+				return fmt.Errorf("Error processing line [%s]: %s", line, err.Error())
 			}
 		} else {
 			fmt.Println(fmt.Sprintf("Could not decode line [%s]: %s", line, err.Error()))
