@@ -95,31 +95,53 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 		}
 	} else if subcmd == "CHANMODES" {
 		fmt.Println("CHANMODES:", m.Params[1])
+		//TODO(dan): store channel prefixes as well.
 		vars := strings.Split(m.Params[1], " ")
 		for _, val := range vars {
 			if len(val) > 1 {
 				keyval := strings.SplitN(val, "=", 2)
 				key := keyval[0]
 				var value string
-				if len(keyval) < 2 {
+				if len(keyval) > 1 {
 					value = keyval[1]
 				}
 
-				p.chanmodes[key] = value
+				// regular modes are only 1 char long
+				if len(value) == 1 {
+					mode, exists := ChanModes[key]
+					if exists {
+						p.chanmodes.AddMode(value[0], mode)
+					} else {
+						fmt.Println("I don't know mode", val)
+					}
+				}
+
+				p.chanmodesraw[key] = value
 			}
 		}
 	} else if subcmd == "USERMODES" {
+		fmt.Println("USERMODES:", m.Params[1])
 		vars := strings.Split(m.Params[1], " ")
 		for _, val := range vars {
 			if len(val) > 1 {
 				keyval := strings.SplitN(val, "=", 2)
 				key := keyval[0]
 				var value string
-				if len(keyval) < 2 {
+				if len(keyval) > 1 {
 					value = keyval[1]
 				}
 
-				p.usermodes[key] = value
+				// regular modes are only 1 char long
+				if len(value) == 1 {
+					mode, exists := UserModes[key]
+					if exists {
+						p.usermodes.AddMode(value[0], mode)
+					} else {
+						fmt.Println("I don't know mode", val)
+					}
+				}
+
+				p.usermodesraw[key] = value
 			}
 		}
 	} else if subcmd == "CAPABILITIES" {
@@ -129,7 +151,7 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 				keyval := strings.SplitN(val, "=", 2)
 				key := keyval[0]
 				var value string
-				if len(keyval) < 2 {
+				if len(keyval) > 1 {
 					value = keyval[1]
 				}
 

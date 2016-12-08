@@ -13,6 +13,7 @@ import (
 	"github.com/DanielOaks/girc-go/ircmsg"
 	"github.com/Verum/veritas/lib"
 	"github.com/Verum/veritas/lib/s2s/deps"
+	"github.com/Verum/veritas/lib/s2s/deps/ircmodes"
 )
 
 // InspIRCd is the S2S protocol module for Insp.
@@ -25,9 +26,12 @@ type InspIRCd struct {
 	sid         string // server id
 
 	modsupport   map[string]bool // modules loaded on remote
-	chanmodes    map[string]string
-	usermodes    map[string]string
+	chanmodesraw map[string]string
+	usermodesraw map[string]string
 	capabilities map[string]string
+
+	chanmodes ircmodes.ModeManager
+	usermodes ircmodes.ModeManager
 
 	receivedFirstBurst bool // whether we've received first burst from remote
 
@@ -52,9 +56,12 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	p.protocol = "InspIRCd"
 	p.casemapping = ircmap.RFC1459
 	p.modsupport = make(map[string]bool)
-	p.chanmodes = make(map[string]string)
-	p.usermodes = make(map[string]string)
+	p.chanmodesraw = make(map[string]string)
+	p.usermodesraw = make(map[string]string)
 	p.capabilities = make(map[string]string)
+
+	p.chanmodes = ircmodes.NewModeManager()
+	p.usermodes = ircmodes.NewModeManager()
 
 	p.servers = make(map[string]*Server)
 	p.clients = make(map[string]*Client)
