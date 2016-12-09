@@ -2,6 +2,8 @@
 // released under the MIT license
 package ircmodes
 
+import "fmt"
+
 // ModeType refers to the mode type, which change how each specific mode is set and unset.
 type ModeType int
 
@@ -48,13 +50,74 @@ func (mm *ModeManager) AddMode(char byte, mode *Mode) {
 	mm.NameTobyte[mode.Name] = char
 }
 
-// ParseModestring parses an incoming modestring and returns a ModeList based on the mode types we have.
-func (mm *ModeManager) ParseModestring(params ...string) ModeList {
+// ParseModestringToList parses an incoming modestring and returns a ModeList based on the mode types we have.
+func (mm *ModeManager) ParseModestringToList(params ...string) ModeList {
 	ml := NewModeList()
 
-	//TODO(dan): populate ml
+	mc := mm.ParseModeChanges(params...)
+	mm.ApplyModeChanges(&ml, mc)
 
 	return ml
+}
+
+// ApplyModeChanges applies the given ModeChanges to the given ModeList.
+func (mm *ModeManager) ApplyModeChanges(ml *ModeList, mc ModeChanges) {
+	for _, change := range mc {
+		mode := mm.Modes[change.Mode]
+		if mode == nil {
+			// couldn't find mode
+			fmt.Println("Don't know mode from change", change)
+			continue
+		}
+
+		if change.Op == Add {
+			if mode.Type == TypeA {
+				model, exists := ml.Modes[change.Mode]
+				if !exists {
+					var newModel ModeVal
+					model = &newModel
+				}
+				// make sure we don't add dupe modes
+				var dupeParam bool
+				for _, val := range model.List {
+					if val == change.Param {
+						dupeParam = true
+					}
+				}
+				if dupeParam {
+					continue
+				}
+
+				model.List = append(model.List, change.Param)
+			} else {
+				var newModel ModeVal
+				newModel.Param = change.Param
+				ml.Modes[change.Mode] = &newModel
+			}
+		} else if change.Op == Remove {
+			if mode.Type == TypeA {
+				model, exists := ml.Modes[change.Mode]
+				if !exists {
+					continue
+				}
+				var newModel ModeVal
+				for _, val := range model.List {
+					if val != change.Param {
+						newModel.List = append(newModel.List, val)
+					}
+				}
+				ml.Modes[change.Mode] = &newModel
+			} else {
+				delete(ml.Modes, change.Mode)
+			}
+		}
+	}
+}
+
+// return the canonical representation of a modelist
+func (mm *ModeManager) String(ml *ModeList) string {
+	//TODO(dan): implement
+	return ""
 }
 
 // ModeVal is used in storing mode values.
