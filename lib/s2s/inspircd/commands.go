@@ -15,6 +15,8 @@ import (
 var (
 	// ErrorNotEnoughParams is returned when there aren't enough params in the message.
 	ErrorNotEnoughParams = errors.New("Not enough params")
+	// ErrorUnknown represents an unknown error.
+	ErrorUnknown = errors.New("Unknown error, check logs")
 )
 
 // Command represents a command that the Insp S2S protocol module can handle.
@@ -33,6 +35,10 @@ var (
 		"CAPAB": &Command{
 			MinParams: 1,
 			Handler:   capabHandler,
+		},
+		"OPERTYPE": &Command{
+			MinParams: 1,
+			Handler:   opertypeHandler,
 		},
 		"PING": &Command{
 			MinParams: 2,
@@ -230,6 +236,18 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	return nil
 }
 
+func opertypeHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
+	c, exists := p.clients[m.Prefix]
+	if !exists {
+		fmt.Println("Got OPERTYPE", m.Params, "for unknown client", m.Prefix)
+		return ErrorUnknown
+	}
+
+	c.OperType = m.Params[0]
+	p.clients[m.Prefix] = c
+	return nil
+}
+
 func pingHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	//TODO(dan): Update our own PING time based on this?
 	p.s.Send(nil, p.sid, "PING", m.Params[1], m.Params[0])
@@ -261,30 +279,35 @@ func serverHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 }
 
 func uidHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
-	fmt.Println("UID:", m)
+	// get server
+	server := p.servers[m.Prefix]
 
-	// uid := m.Params[0]
-	// timestamp := m.Params[1]
-	// nick := m.Params[2]
-	// hostname := m.Params[3]
-	// displayedHostname := m.Params[4]
-	// ident := m.Params[5]
-	// ip := m.Params[6]
-	// signonTime := m.Params[7]
-	// realname := m.Params[len(m.Params)-1]
+	uid := m.Params[0]
+	timestamp := m.Params[1]
+	nick := m.Params[2]
+	hostname := m.Params[3]
+	displayedHostname := m.Params[4]
+	ident := m.Params[5]
+	ip := m.Params[6]
+	signonTime := m.Params[7]
+	realname := m.Params[len(m.Params)-1]
 
-	// // get modes
-	// var modes []string
-	// for i, param := range m.Params {
-	// 	if i > 7 && i < len(m.Params)-1 {
-	// 		modes = append(modes, param)
-	// 	}
-	// }
+	// get modes
+	var modes []string
+	for i, param := range m.Params {
+		if i > 7 && i < len(m.Params)-1 {
+			modes = append(modes, param)
+		}
+	}
 
-	// c := MakeClient(uid, timestamp, nick, hostname, displayedHostname, ident, ip, signonTime, modes, realname)
+	modeList := p.usermodes.ParseModestringToList(modes...)
 
-	// fmt.Println("Client made:", c)
+	c, err := MakeClient(server, uid, timestamp, nick, hostname, displayedHostname, ident, ip, signonTime, modeList, realname)
+	if err != nil {
+		return err
+	}
 
+	p.clients[uid] = c
 	return nil
 }
 
