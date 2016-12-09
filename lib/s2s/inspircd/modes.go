@@ -28,12 +28,15 @@ var (
 
 	// ChanModes are the channel modes that Insp uses.
 	ChanModes = map[string]*ircmodes.Mode{
+		"admin":         &ircmodes.ChanAdmin,
 		"ban":           &ircmodes.ChanBan,
 		"banexception":  &ircmodes.ChanBanException,
 		"blockcolor":    &ircmodes.ChanBlockColor,
 		"c_registered":  &ircmodes.ChanRegistered,
 		"delaymsg":      &chanDelayMsg,
 		"exemptchanops": &chanExemptChanops,
+		"founder":       &ircmodes.ChanFounder,
+		"halfop":        &ircmodes.ChanHalfop,
 		"invex":         &ircmodes.ChanInviteException,
 		"inviteonly":    &ircmodes.ChanInviteOnly,
 		"joinflood":     &ircmodes.ChanJoinThrottle,
@@ -41,12 +44,14 @@ var (
 		"limit":         &ircmodes.ChanLimit,
 		"moderated":     &ircmodes.ChanModerated,
 		"noextmsg":      &ircmodes.ChanNoExternal,
+		"op":            &ircmodes.ChanOp,
 		"private":       &ircmodes.ChanPrivate,
 		"reginvite":     &chanRegInvite,
 		"regmoderated":  &chanRegModerated,
 		"secret":        &ircmodes.ChanSecret,
 		"sslonly":       &ircmodes.ChanTLSOnly,
 		"topiclock":     &chanTopicLock,
+		"voice":         &ircmodes.ChanVoice,
 	}
 )
 

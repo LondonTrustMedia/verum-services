@@ -113,14 +113,22 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 					value = keyval[1]
 				}
 
-				// regular modes are only 1 char long
 				if len(value) == 1 {
+					// regular modes are only 1 char long
 					mode, exists := ChanModes[key]
 					if exists {
 						p.chanmodes.AddMode(value[0], mode)
 					} else {
 						fmt.Println("I don't know mode", val, "autogenerating")
 						p.unknownCmodes[value[0]] = key
+					}
+				} else if len(value) == 2 {
+					// channel prefixes
+					mode, exists := ChanModes[key]
+					if exists {
+						p.chanmodes.AddMode(value[1], mode)
+					} else {
+						return fmt.Errorf("I can't parse mode %s correctly: %s", key, m.Params[1])
 					}
 				}
 
@@ -224,6 +232,10 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 							}
 						}
 					}
+				}
+
+				if key == "PREFIX" {
+					fmt.Println("TODO(dan): Track channel prefixes properly.")
 				}
 
 				p.capabilities[key] = value
