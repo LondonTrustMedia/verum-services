@@ -37,10 +37,11 @@ type InspIRCd struct {
 
 	receivedFirstBurst bool // whether we've received first burst from remote
 
-	uplink    *Server
-	servers   map[string]*Server
-	clients   map[string]*Client
-	myClients map[string]*Client
+	thisServer *Server
+	uplink     *Server
+	servers    map[string]*Server
+	clients    map[string]*Client
+	myClients  map[string]*Client
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
@@ -66,6 +67,14 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 
 	p.chanmodes = ircmodes.NewModeManager()
 	p.usermodes = ircmodes.NewModeManager()
+
+	// thisServer is used for clients originating from me
+	p.thisServer = &Server{
+		SID:         config.Linking.ServerID,
+		Name:        config.Server.Name,
+		Description: config.Server.Description,
+		Links:       make(map[*Server]bool),
+	}
 
 	p.servers = make(map[string]*Server)
 	p.clients = make(map[string]*Client)

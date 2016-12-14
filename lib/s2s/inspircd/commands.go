@@ -36,6 +36,10 @@ var (
 			MinParams: 1,
 			Handler:   capabHandler,
 		},
+		"FJOIN": &Command{
+			MinParams: 4,
+			Handler:   fjoinHandler,
+		},
 		"OPERTYPE": &Command{
 			MinParams: 1,
 			Handler:   opertypeHandler,
@@ -63,12 +67,14 @@ var (
 func HandleCommand(p *InspIRCd, m *ircmsg.IrcMessage, line string) error {
 	cmd, exists := Commands[m.Command]
 	if !exists || cmd == nil {
-		return fmt.Errorf("Command %s not implemented", m.Command)
+		fmt.Println(fmt.Sprintf("Command %s not implemented", m.Command))
+		return nil
 	}
 
 	// check param length, etc
 	if len(m.Params) < cmd.MinParams {
-		return fmt.Errorf("Not enough params for %s, expected %d but got %d: %s", m.Command, cmd.MinParams, len(m.Params), line)
+		fmt.Println(fmt.Sprintf("Not enough params for %s, expected %d but got %d: %s", m.Command, cmd.MinParams, len(m.Params), line))
+		return nil
 	}
 
 	return cmd.Handler(p, m)
@@ -248,6 +254,11 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	return nil
 }
 
+func fjoinHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
+	fmt.Println("FJOIN:", m)
+	return nil
+}
+
 func opertypeHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	c, exists := p.clients[m.Prefix]
 	if !exists {
@@ -262,8 +273,7 @@ func opertypeHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 
 func pingHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	//TODO(dan): Update our own PING time based on this?
-	p.s.Send(nil, p.sid, "PING", m.Params[1], m.Params[0])
-	fmt.Println("PING!!!", m)
+	p.s.Send(nil, p.sid, "PONG", m.Params[1], m.Params[0])
 	return nil
 }
 
@@ -272,6 +282,7 @@ func serverHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 		SID:         m.Params[3],
 		Name:        m.Params[0],
 		Description: m.Params[4],
+		Links:       make(map[*Server]bool),
 	}
 
 	if p.uplink == nil {
@@ -281,6 +292,11 @@ func serverHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 		}
 
 		p.uplink = &newServer
+
+		p.thisServer.Links[&newServer] = true
+	} else {
+		fmt.Println("I don't know how to handle incoming links from the remote side:", m)
+		fmt.Println("Please make sure that I'm added to the Links block of the relevant server.")
 	}
 
 	p.servers[newServer.Name] = &newServer
