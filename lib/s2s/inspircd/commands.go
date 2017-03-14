@@ -5,11 +5,13 @@ package inspircd
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"strings"
 
 	"github.com/DanielOaks/girc-go/ircmsg"
 	"github.com/Verum/veritas/lib/s2s/deps/ircmodes"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -256,6 +258,73 @@ func capabHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 
 func fjoinHandler(p *InspIRCd, m *ircmsg.IrcMessage) error {
 	fmt.Println("FJOIN:", m)
+
+	// get name and timestamp
+	casefoldedName, err := p.CasemapString(m.Params[0])
+	if err != nil {
+		fmt.Println("Could not casemap given channel name:", m)
+		return ErrorUnknown
+	}
+
+	ts, err := strconv.ParseInt(m.Params[1], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// get modes
+	var modes []string
+	for i, param := range m.Params {
+		if i > 1 && i < len(m.Params)-1 {
+			modes = append(modes, param)
+		}
+	}
+
+	modeList := p.chanmodes.ParseModestringToList(modes...)
+	members := NewMemberList()
+
+	// add chan priv info
+	// last param contains user info
+	for _, upriv := range strings.Split(m.Params[len(m.Params)-1], " ") {
+		if len(upriv) < 1 {
+			continue
+		}
+
+		info := strings.Split(upriv, ",")
+		uid := info[1]
+		c := p.clients[uid]
+
+		// add to members list
+		members.Members[c] = true
+
+		// add to prefixes list
+		prefixes, exists := members.Prefixes[c]
+		if !exists {
+			prefixes = make(ircmodes.PrefixList)
+		}
+		for _, char := range info[0] {
+			mode := p.chanmodes.Modes[byte(char)]
+			prefixes[mode] = true
+		}
+		members.Prefixes[c] = prefixes
+	}
+
+	// add to internal list
+	ch, exists := p.channels[casefoldedName]
+	if exists {
+		// update channel info with given info, and modes if ts is newer
+	} else {
+		ch = &Channel{
+			Name:      m.Params[0],
+			Timestamp: ts,
+			Modes:     modeList,
+			Members:   members,
+		}
+	}
+
+	spew.Dump(ch)
+
+	p.channels[casefoldedName] = ch
+
 	return nil
 }
 

@@ -25,6 +25,7 @@ var (
 		Name: "voice",
 		Type: ChanPrefix,
 	}
+	ChanPrefixes = []*Mode{&ChanVoice, &ChanHalfop, &ChanOp, &ChanAdmin, &ChanFounder}
 
 	// standard
 

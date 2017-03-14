@@ -37,11 +37,13 @@ type InspIRCd struct {
 
 	receivedFirstBurst bool // whether we've received first burst from remote
 
-	thisServer *Server
-	uplink     *Server
-	servers    map[string]*Server
-	clients    map[string]*Client
-	myClients  map[string]*Client
+	thisServer     *Server
+	uplink         *Server
+	servers        map[string]*Server
+	clients        map[string]*Client
+	myClients      map[string]*Client
+	channels       map[string]*Channel
+	clientChannels map[*Client]map[string]bool
 }
 
 // MakeInsp returns an InspIRCd S2S protocol module.
@@ -79,6 +81,8 @@ func MakeInsp(config *lib.Config) (*InspIRCd, error) {
 	p.servers = make(map[string]*Server)
 	p.clients = make(map[string]*Client)
 	p.myClients = make(map[string]*Client)
+	p.channels = make(map[string]*Channel)
+	p.clientChannels = make(map[*Client]map[string]bool)
 
 	return &p, nil
 }
@@ -132,7 +136,7 @@ func (p *InspIRCd) Run(config *lib.Config) error {
 
 	// send burst as well
 	p.s.Send(nil, p.sid, "BURST", strconv.FormatInt(time.Now().Unix(), 10))
-	p.s.Send(nil, p.sid, "VERSION", fmt.Sprintf("Veritas-%s using %s", lib.SemVer, p.protocol))
+	p.s.Send(nil, p.sid, "VERSION", fmt.Sprintf("Veritas-%s %s :Veritas-%s with %s protocol", lib.SemVer, config.Server.Name, lib.SemVer, p.protocol))
 	p.s.Send(nil, p.sid, "ENDBURST")
 
 	for {

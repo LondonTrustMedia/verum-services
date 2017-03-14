@@ -24,6 +24,8 @@ type Client struct {
 	Modes             ircmodes.ModeList
 	Realname          string
 	OperType          string
+
+	channels map[*Channel]bool
 }
 
 // MakeClient makes an InspIRCd client.
@@ -53,6 +55,7 @@ func MakeClient(server *Server, uid, timestamp, nick, hostname, displayedHostnam
 		SignonTime:        signon,
 		Modes:             modes,
 		Realname:          realname,
+		channels:          make(map[*Channel]bool),
 	}
 
 	return &c, nil
